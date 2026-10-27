@@ -53,7 +53,7 @@ export default function App() {
   };
 
   if (isLoading) return <main className="app"><div className="mx-auto max-w-6xl space-y-6"><Skeleton className="h-16" /><Skeleton className="h-72" /><div className="grid grid-cols-2 gap-4 md:grid-cols-4"><Skeleton className="h-28" /><Skeleton className="h-28" /><Skeleton className="h-28" /><Skeleton className="h-28" /></div></div></main>;
-  if (isError || !data) return <main className="app"><div className="mx-auto max-w-xl glass rounded-3xl p-10 text-center"><h1 className="text-2xl font-bold">We lost the forecast</h1><p className="mt-2 text-slate-500">Check your connection or try again in a moment.</p><button onClick={() => refetch()} className="button mt-6"><RefreshCw size={16} /> Try again</button></div></main>;
+  if ((isError && !data) || !data) return <main className="app"><div className="mx-auto max-w-xl glass rounded-3xl p-10 text-center"><h1 className="text-2xl font-bold">We lost the forecast</h1><p className="mt-2 text-slate-500">Check your connection or try again in a moment.</p><button onClick={() => refetch()} className="button mt-6"><RefreshCw size={16} /> Try again</button></div></main>;
 
   const current = data.current;
   const currentType = current.is_day ? current.condition.type : 'night';

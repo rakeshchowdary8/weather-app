@@ -5,18 +5,40 @@ import { getAirQuality, getWeather, geocode, reverseGeocode } from '../services/
 import { validate } from '../middleware/validate.js';
 
 const router = Router();
-const cache = new NodeCache({ stdTTL: 600 });
+const cache = new NodeCache({ stdTTL: 1800, checkperiod: 120 });
+const staleCache = new NodeCache({ stdTTL: 86400, checkperiod: 600 });
+const inFlight = new Map();
 const coords = z.object({ lat: z.coerce.number().min(-90).max(90), lon: z.coerce.number().min(-180).max(180) });
 const weatherSchema = coords.extend({ units: z.enum(['metric', 'imperial']).default('metric') });
 
 router.get('/weather', validate(weatherSchema), async (req, res, next) => {
+  const { lat, lon, units } = req.validated;
+  const key = `${lat.toFixed(2)}:${lon.toFixed(2)}:${units}`;
   try {
-    const { lat, lon, units } = req.validated;
-    const key = `${lat.toFixed(2)}:${lon.toFixed(2)}:${units}`;
     let data = cache.get(key);
-    if (!data) { data = await getWeather({ lat, lon, units }); cache.set(key, data); }
+    if (!data) {
+      let request = inFlight.get(key);
+      if (!request) {
+        request = getWeather({ lat, lon, units });
+        inFlight.set(key, request);
+      }
+      try {
+        data = await request;
+        cache.set(key, data);
+        staleCache.set(key, data);
+      } finally {
+        if (inFlight.get(key) === request) inFlight.delete(key);
+      }
+    }
     res.json(data);
-  } catch (error) { next(error); }
+  } catch (error) {
+    const stale = staleCache.get(key);
+    if (stale) {
+      return res.json({ ...stale, stale: true });
+    }
+    error.status = error.status || 503;
+    next(error);
+  }
 });
 
 router.get('/air-quality', validate(coords), async (req, res, next) => {

@@ -14,7 +14,14 @@ const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.resolve(__dirname, "../../client/dist");
 app.use(helmet());
-app.use(cors({ origin: env.clientUrl === "*" ? true : env.clientUrl }));
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || env.clientUrls.includes('*') || env.clientUrls.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin is not allowed by CORS'));
+  },
+}));
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 300 }));
