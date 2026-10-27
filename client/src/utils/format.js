@@ -1,0 +1,1 @@
+export const temp=(v,u)=>`${Math.round(v)}°${u==='metric'?'C':'F'}`; export const time=(v,tz)=>new Intl.DateTimeFormat('en',{hour:'numeric',minute:'2-digit',timeZone:tz}).format(new Date(v)); export const day=(v,tz)=>new Intl.DateTimeFormat('en',{weekday:'short',month:'short',day:'numeric',timeZone:tz}).format(new Date(`${v}T12:00:00`));

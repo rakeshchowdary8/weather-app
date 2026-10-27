@@ -1,0 +1,25 @@
+
+{
+  "name": "skycast-server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "build": "npm install --prefix ../client && npm run build --prefix ../client",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "mongoose": "^8.7.1",
+    "morgan": "^1.10.0",
+    "node-cache": "^5.1.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

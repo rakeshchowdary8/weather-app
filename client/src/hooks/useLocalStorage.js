@@ -1,0 +1,1 @@
+import {useState} from 'react'; export function useLocalStorage(key,initial){const [value,setValue]=useState(()=>{try{return JSON.parse(localStorage.getItem(key))??initial}catch{return initial}});const set=v=>{const next=typeof v==='function'?v(value):v;setValue(next);localStorage.setItem(key,JSON.stringify(next))};return [value,set]}

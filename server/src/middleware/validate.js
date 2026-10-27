@@ -1,0 +1,1 @@
+export const validate = schema => (req,res,next) => { const parsed = schema.safeParse({ ...req.query, ...req.body }); if (!parsed.success) return res.status(400).json({ message:'Invalid request', errors:parsed.error.flatten() }); req.validated = parsed.data; next(); };
