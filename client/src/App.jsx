@@ -17,7 +17,7 @@ const placeKey = (place) => `${place.latitude}:${place.longitude}`;
 
 export default function App() {
   const { city, setCity, units } = useApp();
-  const { data, isLoading, isError, refetch } = useWeather(city, units);
+  const { data, isLoading, isError, isFetching, refetch } = useWeather(city, units);
   const [favorites, setFavorites] = useState(() => JSON.parse(localStorage.getItem('skycast-favorites') || '[]'));
   const [air, setAir] = useState(null);
   const latitude = city?.latitude ?? city?.lat;
@@ -58,6 +58,7 @@ export default function App() {
   const current = data.current;
   const currentType = current.is_day ? current.condition.type : 'night';
   return <main className={`app weather-${currentType}`}><div className="mx-auto max-w-6xl space-y-5">
+    {isFetching && <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300" role="status">Updating forecast for {city.name}...</div>}
     <SearchBar />
     <div className="grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="hero rounded-3xl p-7 md:p-10"><div className="flex items-start justify-between"><div><p className="text-lg text-white/70">{city.name}, {city.country}</p><p className="mt-5 text-7xl font-semibold tracking-tighter md:text-8xl">{temp(current.temperature_2m, units)}</p><p className="mt-3 text-xl text-white/80">{current.condition.label}</p></div><WeatherIcon type={currentType} size={90} /></div><div className="mt-10 flex flex-wrap gap-5 text-sm text-white/80"><span>Feels like {temp(current.apparent_temperature, units)}</span><span>H:{temp(data.daily[0].max, units)} · L:{temp(data.daily[0].min, units)}</span><span>{time(data.daily[0].sunrise, data.timezone)} sunrise</span></div></motion.div>

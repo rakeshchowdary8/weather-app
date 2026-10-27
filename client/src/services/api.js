@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const api = axios.create({
   baseURL: (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')).replace(/\/$/, ''),
-  timeout: 12000,
+  timeout: 30000,
 });
 
 export const weatherApi = {
@@ -20,8 +20,8 @@ export const weatherApi = {
     longitude: place.longitude,
     timezone: place.timezone,
   }).then((response) => response.data),
-  geocode: (query) => {
+  geocode: (query, signal) => {
     if (!query?.trim()) return Promise.resolve([]);
-    return api.get('/geocode', { params: { q: query } }).then((response) => response.data);
+    return api.get('/geocode', { params: { q: query }, signal }).then((response) => response.data);
   },
 };

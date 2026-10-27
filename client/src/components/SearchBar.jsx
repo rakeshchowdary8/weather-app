@@ -24,6 +24,7 @@ export default function SearchBar() {
   const geo = useGeolocation();
   const guestId = getGuestId();
   const processedLocation = useRef('');
+  const searchAbort = useRef(null);
 
   useEffect(() => {
     weatherApi.history(guestId).then(setHistory).catch(() => setHistory([]));
@@ -32,8 +33,13 @@ export default function SearchBar() {
   const runSearch = (value = query) => {
     const term = value.trim();
     if (term.length < 2) { setItems([]); setSearched(false); return; }
+    searchAbort.current?.abort();
+    searchAbort.current = new AbortController();
     setShowHistory(true);
-    weatherApi.geocode(term).then((results) => { setItems(results); setSearched(true); }).catch(() => { setItems([]); setSearched(true); });
+    weatherApi.geocode(term, searchAbort.current.signal).then((results) => { setItems(results); setSearched(true); }).catch((error) => {
+      if (error?.code === 'ERR_CANCELED') return;
+      setItems([]); setSearched(true);
+    });
   };
 
   useEffect(() => {
@@ -66,11 +72,11 @@ export default function SearchBar() {
     <div className="header-search-wrap">
       <div className="header-search">
         <Search size={18} className="text-slate-400" />
-        <input aria-label="Search city" value={query} onFocus={() => setShowHistory(true)} onChange={(event) => { setQuery(event.target.value); setActive(0); setShowHistory(true); }} onKeyDown={(event) => { if (event.key === 'ArrowDown') setActive((value) => Math.min(value + 1, items.length - 1)); if (event.key === 'ArrowUp') setActive((value) => Math.max(value - 1, 0)); if (event.key === 'Enter') { event.preventDefault(); runSearch(); } }} placeholder="Search city or place..." />
-        {showHistory && (items.length > 0 || searched || (query.length < 2 && history.length > 0)) && <div className="search-menu">{items.length > 0 ? items.map((item, index) => <button key={item.id} onClick={() => choose(item)} className={active === index ? 'active' : ''}><MapPin size={15} /><span><b>{item.name}</b><small>{[item.admin1, item.country].filter(Boolean).join(', ')}</small></span></button>) : searched ? <div className="search-empty">City not found</div> : <>{history.map((item) => <button key={`${item.latitude}:${item.longitude}`} onClick={() => choose(item)}><History size={15} /><span><b>{item.name}</b><small>{item.country || 'Recent search'}</small></span></button>)}</>}</div>}
+        <input type="search" aria-label="Search city" value={query} onFocus={() => setShowHistory(true)} onChange={(event) => { setQuery(event.target.value); setActive(0); setShowHistory(true); }} onKeyDown={(event) => { if (event.key === 'ArrowDown') { event.preventDefault(); setActive((value) => Math.min(value + 1, Math.max(items.length - 1, 0))); } if (event.key === 'ArrowUp') { event.preventDefault(); setActive((value) => Math.max(value - 1, 0)); } if (event.key === 'Enter') { event.preventDefault(); runSearch(); } }} placeholder="Search city or place..." />
+        {showHistory && (items.length > 0 || searched || (query.length < 2 && history.length > 0)) && <div className="search-menu">{items.length > 0 ? items.map((item, index) => <button type="button" key={item.id} onClick={() => choose(item)} className={active === index ? 'active' : ''}><MapPin size={15} /><span><b>{item.name}</b><small>{[item.admin1, item.country].filter(Boolean).join(', ')}</small></span></button>) : searched ? <div className="search-empty">City not found</div> : <>{history.map((item) => <button type="button" key={`${item.latitude}:${item.longitude}`} onClick={() => choose(item)}><History size={15} /><span><b>{item.name}</b><small>{item.country || 'Recent search'}</small></span></button>)}</>}</div>}
       </div>
-      <button className="header-location" onClick={() => { setShowHistory(false); geo.getLocation(); }} disabled={geo.loading} title="Use your current location"><LocateFixed size={17} />{geo.loading ? 'Locating...' : 'My location'}</button>
+      <button type="button" className="header-location" onClick={() => { setShowHistory(false); geo.getLocation(); }} disabled={geo.loading} title="Use your current location"><LocateFixed size={17} />{geo.loading ? 'Locating...' : 'My location'}</button>
     </div>
-    <div className="header-actions"><button className="header-pill" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>{units === 'metric' ? '°C · km/h' : '°F · mph'}</button><button className="header-icon" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</button></div>
+    <div className="header-actions"><button type="button" className="header-pill" onClick={() => setUnits(units === 'metric' ? 'imperial' : 'metric')}>{units === 'metric' ? '°C · km/h' : '°F · mph'}</button><button type="button" className="header-icon" aria-label="Toggle theme" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</button></div>
   </header>;
 }

@@ -31,20 +31,42 @@ const condition = (code) => {
   return { label, type, code };
 };
 export async function geocode(q) {
-  const r = await fetch(
-    `${geoUrl}?name=${encodeURIComponent(q)}&count=8&language=en&format=json`,
-  );
-  if (!r.ok) throw new Error("Geocoding failed");
-  const d = await r.json();
-  return (d.results || []).map((x) => ({
-    id: `${x.latitude}:${x.longitude}`,
-    name: x.name,
-    country: x.country,
-    admin1: x.admin1,
-    latitude: x.latitude,
-    longitude: x.longitude,
-    timezone: x.timezone,
-  }));
+  try {
+    const r = await fetch(
+      `${geoUrl}?name=${encodeURIComponent(q)}&count=8&language=en&format=json`,
+      { signal: AbortSignal.timeout(10000) },
+    );
+    if (!r.ok) throw new Error("Open-Meteo geocoding failed");
+    const d = await r.json();
+    return (d.results || []).map((x) => ({
+      id: `${x.latitude}:${x.longitude}`,
+      name: x.name,
+      country: x.country,
+      admin1: x.admin1,
+      latitude: x.latitude,
+      longitude: x.longitude,
+      timezone: x.timezone,
+    }));
+  } catch (primaryError) {
+    console.warn(`Open-Meteo geocoding unavailable (${primaryError.message}); using fallback provider.`);
+    const url = new URL("https://nominatim.openstreetmap.org/search");
+    url.search = new URLSearchParams({ q, format: "jsonv2", addressdetails: "1", limit: "8" });
+    const response = await fetch(url, {
+      headers: { "User-Agent": "SkyCast/1.0 weather dashboard" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) throw new Error("Geocoding providers unavailable");
+    const results = await response.json();
+    return results.map((item) => ({
+      id: `${item.lat}:${item.lon}`,
+      name: item.name || item.display_name?.split(",")[0] || q,
+      country: item.address?.country || "",
+      admin1: item.address?.state || item.address?.county || "",
+      latitude: Number(item.lat),
+      longitude: Number(item.lon),
+      timezone: undefined,
+    }));
+  }
 }
 async function getOpenMeteoWeather({ lat, lon, units = "metric" }) {
   const latitude = Number(lat);

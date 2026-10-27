@@ -12,7 +12,8 @@ export function useWeather(city, units) {
     enabled: Number.isFinite(Number(latitude)) && Number.isFinite(Number(longitude)),
     staleTime: 600000,
     refetchOnWindowFocus: false,
-    placeholderData: () => {
+    placeholderData: (previousData) => {
+      if (previousData) return previousData;
       try { return JSON.parse(localStorage.getItem(storageKey) || 'null'); } catch { return undefined; }
     },
   });
