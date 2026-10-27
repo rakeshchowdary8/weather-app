@@ -1,0 +1,46 @@
+html,body,#root{width:100%;min-width:320px;overflow-x:hidden}
+.app{overflow-x:clip}
+.app>div{min-width:0}
+.glass,.forecast-card{min-width:0}
+.forecast-card{overflow:hidden}
+.hourly-header{min-width:0;gap:16px}
+.hourly-list{min-width:0;scrollbar-width:thin}
+.hourly-list::-webkit-scrollbar{height:4px}
+.hourly-list::-webkit-scrollbar-thumb{background:rgba(125,211,252,.35);border-radius:999px}
+.day-row{min-width:0}
+.day-row>span{min-width:0}
+.day-row>span:nth-of-type(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.forecast-card .recharts-responsive-container{min-width:0}
+.forecast-status{position:fixed;top:76px;left:50%;z-index:1200;width:min(420px,calc(100vw - 24px));transform:translateX(-50%);padding:10px 16px;border:1px solid rgba(125,211,252,.42);border-radius:999px;background:rgba(8,47,73,.96);box-shadow:0 14px 35px rgba(2,6,23,.3);color:#bae6fd;font-size:13px;font-weight:600;text-align:center;pointer-events:none;backdrop-filter:blur(14px)}
+.light .forecast-status{border-color:rgba(14,116,144,.24);background:rgba(255,255,255,.96);box-shadow:0 14px 35px rgba(30,64,175,.16);color:#0369a1}
+
+@media(max-width:767px){
+  .app{padding:0 12px 20px}
+  .app>div{width:100%}
+  .site-header{width:calc(100% + 24px)!important;margin-left:-12px!important;margin-right:-12px!important;padding-left:12px!important;padding-right:12px!important}
+  .hero{padding:24px!important}
+  .hero p.text-7xl{font-size:clamp(3.5rem,18vw,5rem);line-height:1}
+  .hourly-header{display:block}
+  .hourly-list{margin-top:14px;padding-bottom:5px}
+  .forecast-card{padding:16px!important}
+  .day-row{gap:8px;padding:11px 0;font-size:12px}
+  .day-row>.w-24{width:4.5rem;flex:none}
+  .day-row>b{white-space:nowrap}
+  .app>div>footer{width:calc(100% + 24px)!important;margin-left:-12px!important;margin-right:-12px!important;padding-left:12px!important;padding-right:12px!important}
+  .forecast-status{top:136px}
+}
+
+@media(max-width:420px){
+  .site-brand b{font-size:14px}
+  .site-brand{min-width:0}
+  .header-actions{right:10px;top:14px}
+  .header-pill{padding:8px 9px;font-size:11px}
+  .header-location{padding:9px 8px;font-size:11px}
+  .hero{padding:20px!important}
+  .hero .text-7xl{font-size:3.5rem}
+  .metric{padding:10px 8px}
+  .metric strong{font-size:13px}
+  .day-row>.w-24{width:4rem}
+  .day-row>svg{flex:none}
+  .day-row>span:nth-of-type(2){display:none}
+}
