@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>SkyCast Weather</title>
+  <defs>
+    <linearGradient id="sky" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#sky)"/>
+  <circle cx="42" cy="23" r="11" fill="#fde047"/>
+  <path d="M17 45h29.5a9.5 9.5 0 0 0 0-19 12.5 12.5 0 0 0-23.7 3.8A7.7 7.7 0 0 0 17 45Z" fill="#fff"/>
+  <path d="M17 45h29.5a9.5 9.5 0 0 0 0-19c-1.1 0-2.2.2-3.2.6A12.5 12.5 0 0 0 21.8 30 7.7 7.7 0 0 0 17 45Z" fill="#e0f2fe" opacity=".72"/>
+</svg>
